@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+
+# local notes / agent instructions
+AGENTS.md
+prompts/
+prompts.md
+*.prompt.md
+NOTE.md
