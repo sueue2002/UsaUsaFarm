@@ -1,6 +1,8 @@
 const STORAGE_KEY = "usa-usa-farm-state-v1";
 const BACKUP_KEY = `${STORAGE_KEY}-backup`;
 const SAVE_VERSION = 1;
+const MAX_VISUAL_RABBITS = 120;
+const VISUAL_RABBIT_PADDING = 26;
 
 const carrotTiers = [
   { name: "ふつうのにんじん", className: "carrot-normal", gain: 0.2, cost: 10 },
@@ -48,6 +50,7 @@ const defaultState = {
 let state = loadState();
 let audioContext;
 let soundBuffers = [];
+let visualRabbits = [];
 let lastTick = performance.now();
 let lastAutoSave = performance.now();
 let lastUiUpdate = performance.now();
@@ -66,6 +69,7 @@ const els = {
   handCost: document.getElementById("handCost"),
   farm: document.getElementById("farm"),
   petButton: document.getElementById("petButton"),
+  visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
   sampleSound: document.getElementById("sampleSound"),
@@ -225,10 +229,32 @@ function petRabbit(event) {
   const gain = currentUpc();
   addRabbits(gain);
   state.stats.totalClicks += 1;
+  addVisualRabbit();
   spawnFloat(gain, event);
   playPyon();
   saveState();
   render();
+}
+
+function addVisualRabbit() {
+  const rect = els.farm.getBoundingClientRect();
+  const maxX = Math.max(0, rect.width - VISUAL_RABBIT_PADDING * 2);
+  const maxY = Math.max(0, rect.height - VISUAL_RABBIT_PADDING * 2);
+  const rabbit = document.createElement("span");
+  const scale = 0.82 + Math.random() * 0.36;
+
+  rabbit.className = "visual-rabbit";
+  rabbit.style.left = `${VISUAL_RABBIT_PADDING + Math.random() * maxX}px`;
+  rabbit.style.top = `${VISUAL_RABBIT_PADDING + Math.random() * maxY}px`;
+  rabbit.style.setProperty("--rabbit-scale", scale.toFixed(2));
+  rabbit.style.setProperty("--rabbit-tilt", `${Math.random() * 18 - 9}deg`);
+
+  els.visualRabbitLayer.appendChild(rabbit);
+  visualRabbits.push(rabbit);
+
+  while (visualRabbits.length > MAX_VISUAL_RABBITS) {
+    visualRabbits.shift()?.remove();
+  }
 }
 
 function spawnFloat(amount, event) {
