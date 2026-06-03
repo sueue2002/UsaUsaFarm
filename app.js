@@ -241,8 +241,16 @@ function addVisualRabbit() {
   const maxY = Math.max(0, rect.height - VISUAL_RABBIT_PADDING * 2);
   const rabbit = document.createElement("span");
   const scale = 0.82 + Math.random() * 0.36;
+  const direction = Math.random() < 0.5 ? "left" : "right";
 
-  rabbit.className = "visual-rabbit";
+  rabbit.className = `visual-rabbit visual-rabbit-${direction}`;
+  rabbit.innerHTML = `
+    <span class="visual-rabbit-tail"></span>
+    <span class="visual-rabbit-body"></span>
+    <span class="visual-rabbit-head"></span>
+    <span class="visual-rabbit-ear visual-rabbit-ear-back"></span>
+    <span class="visual-rabbit-ear visual-rabbit-ear-front"></span>
+  `;
   rabbit.style.left = `${VISUAL_RABBIT_PADDING + Math.random() * maxX}px`;
   rabbit.style.top = `${VISUAL_RABBIT_PADDING + Math.random() * maxY}px`;
   rabbit.style.setProperty("--rabbit-scale", scale.toFixed(2));
