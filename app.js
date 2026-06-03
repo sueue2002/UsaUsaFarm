@@ -68,7 +68,6 @@ const els = {
   handUpgradeText: document.getElementById("handUpgradeText"),
   handCost: document.getElementById("handCost"),
   farm: document.getElementById("farm"),
-  petButton: document.getElementById("petButton"),
   visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
