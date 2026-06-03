@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>うさうさふぁーむ</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="game-shell" aria-labelledby="game-title">
+      <header class="game-header">
+        <div>
+          <p class="eyebrow">macaron clicker</p>
+          <h1 id="game-title">うさうさふぁーむ</h1>
+        </div>
+        <button id="soundToggle" class="icon-button" type="button" aria-label="音を切り替える">♪</button>
+      </header>
+
+      <section class="stats" aria-label="現在のうさぎ数">
+        <div>
+          <span class="label">うさぎ</span>
+          <strong id="rabbitCount">0</strong>
+        </div>
+        <div>
+          <span class="label">毎秒</span>
+          <strong id="perSecond">0</strong>
+        </div>
+        <div>
+          <span class="label">なでる</span>
+          <strong id="perPet">+1</strong>
+        </div>
+      </section>
+
+      <section class="farm" aria-label="うさぎをなでる">
+        <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
+        <button id="petButton" class="pet-button" type="button" aria-label="うさぎをなでる">
+          <span id="carrotGem" class="carrot carrot-normal"></span>
+          <span class="bunny" aria-hidden="true">
+            <span class="ear left"></span>
+            <span class="ear right"></span>
+            <span class="face">
+              <span class="eye left"></span>
+              <span class="eye right"></span>
+              <span class="nose"></span>
+            </span>
+          </span>
+          <span class="pet-text">なでる</span>
+        </button>
+      </section>
+
+      <section class="upgrade-panel" aria-label="強化">
+        <div class="level-card">
+          <span class="label">にんじん</span>
+          <strong id="carrotName">ふつうのにんじん</strong>
+          <span id="carrotHint">毎秒 +0.2</span>
+        </div>
+
+        <button id="carrotUpgrade" class="upgrade-button" type="button">
+          <span>
+            <strong>にんじん強化</strong>
+            <small id="carrotUpgradeText">毎秒増加量を上げる</small>
+          </span>
+          <b id="carrotCost">25</b>
+        </button>
+
+        <button id="handUpgrade" class="upgrade-button" type="button">
+          <span>
+            <strong>なでる手強化</strong>
+            <small id="handUpgradeText">なでる増加量を上げる</small>
+          </span>
+          <b id="handCost">15</b>
+        </button>
+      </section>
+
+      <footer class="controls">
+        <button id="sampleSound" type="button">SEサンプル</button>
+        <button id="soundVariant" type="button">音色 A</button>
+        <button id="resetGame" type="button">リセット</button>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
