@@ -16,22 +16,11 @@
         <button id="soundToggle" class="icon-button" type="button" aria-label="音を切り替える">♪</button>
       </header>
 
-      <section class="stats" aria-label="現在のうさぎ数">
-        <div>
-          <span class="label">うさぎ</span>
-          <strong id="rabbitCount">0</strong>
+      <section id="farm" class="farm" role="button" tabindex="0" aria-label="うさぎをなでる">
+        <div class="farm-stats" aria-label="現在のうさぎ数">
+          <strong id="rabbitCount">0羽</strong>
+          <span id="perSecond">毎秒 +0羽</span>
         </div>
-        <div>
-          <span class="label">毎秒</span>
-          <strong id="perSecond">0</strong>
-        </div>
-        <div>
-          <span class="label">なでる</span>
-          <strong id="perPet">+1</strong>
-        </div>
-      </section>
-
-      <section class="farm" aria-label="うさぎをなでる">
         <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
         <button id="petButton" class="pet-button" type="button" aria-label="うさぎをなでる">
           <span id="carrotGem" class="carrot carrot-normal"></span>
