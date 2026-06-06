@@ -1,50 +1,76 @@
 const STORAGE_KEY = "usa-usa-farm-state-v1";
 const BACKUP_KEY = `${STORAGE_KEY}-backup`;
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
 const MAX_VISUAL_RABBITS = 120;
 const VISUAL_RABBIT_PADDING = 26;
 const VISUAL_RABBIT_TOP_GAP = 18;
 
-const carrotTiers = [
-  { name: "ふつうのにんじん", className: "carrot-normal", gain: 0.2, cost: 10 },
-  { name: "ルビーのにんじん", className: "carrot-ruby", gain: 0.8, cost: 120 },
-  { name: "ガーネットのにんじん", className: "carrot-garnet", gain: 2.4, cost: 520 },
-  { name: "トパーズのにんじん", className: "carrot-topaz", gain: 7, cost: 1800 },
-  { name: "エメラルドのにんじん", className: "carrot-emerald", gain: 18, cost: 6200 },
-  { name: "サファイアのにんじん", className: "carrot-sapphire", gain: 45, cost: 18000 },
-  { name: "ダイヤのにんじん", className: "carrot-diamond", gain: 120, cost: 60000 }
+const carrotRanks = [
+  { min: 95, name: "ダイヤのにんじん", className: "carrot-diamond" },
+  { min: 70, name: "サファイアのにんじん", className: "carrot-sapphire" },
+  { min: 50, name: "エメラルドのにんじん", className: "carrot-emerald" },
+  { min: 35, name: "トパーズのにんじん", className: "carrot-topaz" },
+  { min: 20, name: "ガーネットのにんじん", className: "carrot-garnet" },
+  { min: 10, name: "ルビーのにんじん", className: "carrot-ruby" },
+  { min: 1, name: "ふつうのにんじん", className: "carrot-normal" },
+  { min: 0, name: "にんじん未解放", className: "carrot-normal carrot-locked" }
 ];
 
-const handTiers = [
-  { name: "そっとなでる", gain: 1, cost: 15 },
-  { name: "ふわふわなで", gain: 3, cost: 90 },
-  { name: "ぽかぽかなで", gain: 8, cost: 420 },
-  { name: "きらきらなで", gain: 22, cost: 1600 },
-  { name: "夢ごこちなで", gain: 60, cost: 5200 },
-  { name: "ダイヤなで", gain: 160, cost: 22000 }
+const handRanks = [
+  { min: 55, name: "月あかりのなで手" },
+  { min: 35, name: "夢ごこちクッション" },
+  { min: 22, name: "うさぎブラシ" },
+  { min: 12, name: "ぽかぽかミトン" },
+  { min: 5, name: "ふわふわ手袋" },
+  { min: 0, name: "そっとなでる" }
 ];
 
 const soundPresets = [
-  { id: "A", label: "ぴょんっ！", start: 520, mid: 610, end: 760, duration: 0.18, volume: 0.18 },
-  { id: "B", label: "ぴょいっ！", start: 470, mid: 650, end: 920, duration: 0.16, volume: 0.15 },
-  { id: "C", label: "ぴょこっ！", start: 620, mid: 560, end: 880, duration: 0.22, volume: 0.13 }
+  { id: "A", label: "音色 A", start: 520, mid: 610, end: 760, duration: 0.18, volume: 0.18 },
+  { id: "B", label: "音色 B", start: 470, mid: 650, end: 920, duration: 0.16, volume: 0.15 },
+  { id: "C", label: "音色 C", start: 620, mid: 560, end: 880, duration: 0.22, volume: 0.13 }
+];
+
+const messageRules = [
+  { id: "clicks-10", test: (s) => s.stats.totalClicks >= 10, text: "うさぎがあつまってきた！" },
+  { id: "rabbits-50", test: (s) => s.rabbits >= 50, text: "ちいさなふぁーむがにぎやかになってきた" },
+  { id: "rabbits-100", test: (s) => s.rabbits >= 100, text: "お庭がもふもふしてきた" },
+  { id: "rabbits-1k", test: (s) => s.rabbits >= 1000, text: "うさぎでいっぱい！" },
+  { id: "rabbits-10k", test: (s) => s.rabbits >= 10000, text: "ふぁーむがふわふわに包まれている" },
+  { id: "carrot-10", test: (s) => s.upgrades.carrotLevel >= 10, text: "ルビーのにんじんを見つけた！" },
+  { id: "hand-10", test: (s) => s.upgrades.handLevel >= 10, text: "なでるのが上手になってきた" }
 ];
 
 const defaultState = {
   version: SAVE_VERSION,
   rabbits: 0,
-  carrotTier: -1,
-  handTier: 0,
-  selectedSound: "C",
-  soundEnabled: true,
-  unlocked: {
+  upgrades: {
+    carrotLevel: 0,
+    handLevel: 0,
+    farmLevel: 0,
+    friendLevel: 0
+  },
+  unlocks: {
     carrot: false,
-    hand: true
+    hand: false,
+    farm: false,
+    friend: false,
+    clover: false,
+    achievements: false
+  },
+  settings: {
+    soundEnabled: true,
+    selectedSound: "C",
+    selectedBackground: null
   },
   stats: {
     totalClicks: 0,
-    totalRabbitsEarned: 0
+    totalRabbitsEarned: 0,
+    totalCloverTapped: 0,
+    maxRabbitsHeld: 0
   },
+  seenMessages: [],
+  unlockedBackgrounds: [],
   updatedAt: 0
 };
 
@@ -52,6 +78,7 @@ let state = loadState();
 let audioContext;
 let soundBuffers = [];
 let visualRabbits = [];
+let messageTimer;
 let lastTick = performance.now();
 let lastAutoSave = performance.now();
 let lastUiUpdate = performance.now();
@@ -70,6 +97,7 @@ const els = {
   handCost: document.getElementById("handCost"),
   farm: document.getElementById("farm"),
   farmStats: document.getElementById("farmStats"),
+  farmMessage: document.getElementById("farmMessage"),
   visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
@@ -101,46 +129,82 @@ function createDefaultState() {
 }
 
 function normalizeState(saved) {
-  const migrated = saved.version ? saved : migrateLegacyState(saved);
-  const selectedSound = soundPresets.some((preset) => preset.id === migrated.selectedSound)
-    ? migrated.selectedSound
-    : defaultState.selectedSound;
+  if (saved.version === 2) return normalizeV2State(saved);
+  return normalizeV2State(migrateLegacyState(saved));
+}
+
+function normalizeV2State(saved) {
+  const selectedSound = soundPresets.some((preset) => preset.id === saved.settings?.selectedSound)
+    ? saved.settings.selectedSound
+    : defaultState.settings.selectedSound;
 
   return {
     version: SAVE_VERSION,
-    rabbits: Math.max(0, Number(migrated.rabbits) || 0),
-    carrotTier: clamp(Number.isFinite(migrated.carrotTier) ? migrated.carrotTier : -1, -1, carrotTiers.length - 1),
-    handTier: clamp(Number.isFinite(migrated.handTier) ? migrated.handTier : 0, 0, handTiers.length - 1),
-    selectedSound,
-    soundEnabled: migrated.soundEnabled !== false,
-    unlocked: {
-      carrot: Boolean(migrated.unlocked?.carrot),
-      hand: migrated.unlocked?.hand !== false
+    rabbits: Math.max(0, Number(saved.rabbits) || 0),
+    upgrades: {
+      carrotLevel: Math.max(0, Math.floor(Number(saved.upgrades?.carrotLevel) || 0)),
+      handLevel: Math.max(0, Math.floor(Number(saved.upgrades?.handLevel) || 0)),
+      farmLevel: clamp(Math.floor(Number(saved.upgrades?.farmLevel) || 0), 0, 6),
+      friendLevel: Math.max(0, Math.floor(Number(saved.upgrades?.friendLevel) || 0))
+    },
+    unlocks: {
+      carrot: Boolean(saved.unlocks?.carrot),
+      hand: Boolean(saved.unlocks?.hand),
+      farm: Boolean(saved.unlocks?.farm),
+      friend: Boolean(saved.unlocks?.friend),
+      clover: Boolean(saved.unlocks?.clover),
+      achievements: Boolean(saved.unlocks?.achievements)
+    },
+    settings: {
+      soundEnabled: saved.settings?.soundEnabled !== false,
+      selectedSound,
+      selectedBackground: saved.settings?.selectedBackground ?? null
     },
     stats: {
-      totalClicks: Math.max(0, Number(migrated.stats?.totalClicks) || 0),
-      totalRabbitsEarned: Math.max(0, Number(migrated.stats?.totalRabbitsEarned) || 0)
+      totalClicks: Math.max(0, Number(saved.stats?.totalClicks) || 0),
+      totalRabbitsEarned: Math.max(0, Number(saved.stats?.totalRabbitsEarned) || 0),
+      totalCloverTapped: Math.max(0, Number(saved.stats?.totalCloverTapped) || 0),
+      maxRabbitsHeld: Math.max(0, Number(saved.stats?.maxRabbitsHeld) || 0)
     },
-    updatedAt: Number(migrated.updatedAt) || Date.now()
+    seenMessages: Array.isArray(saved.seenMessages) ? saved.seenMessages : [],
+    unlockedBackgrounds: Array.isArray(saved.unlockedBackgrounds) ? saved.unlockedBackgrounds : [],
+    updatedAt: Number(saved.updatedAt) || Date.now()
   };
 }
 
 function migrateLegacyState(saved) {
   const soundIndex = Number.isFinite(saved.soundVariant) ? saved.soundVariant : 2;
+  const legacyCarrotLevel = Number.isFinite(saved.carrotTier)
+    ? Math.max(0, saved.carrotTier + 1)
+    : Math.max(0, Number(saved.carrotLevel) || 0);
+  const legacyHandLevel = Number.isFinite(saved.handTier)
+    ? Math.max(0, saved.handTier)
+    : Math.max(0, Number(saved.handLevel) || 0);
+
   return {
-    version: SAVE_VERSION,
+    ...createDefaultState(),
     rabbits: saved.rabbits,
-    carrotTier: Number.isFinite(saved.carrotLevel) ? saved.carrotLevel : -1,
-    handTier: Number.isFinite(saved.handLevel) ? saved.handLevel : 0,
-    selectedSound: soundPresets[clamp(soundIndex, 0, soundPresets.length - 1)].id,
-    soundEnabled: saved.sound !== false,
-    unlocked: {
-      carrot: Number.isFinite(saved.carrotLevel) && saved.carrotLevel >= 0,
-      hand: true
+    upgrades: {
+      carrotLevel: legacyCarrotLevel,
+      handLevel: legacyHandLevel,
+      farmLevel: 0,
+      friendLevel: 0
+    },
+    unlocks: {
+      ...defaultState.unlocks,
+      carrot: legacyCarrotLevel > 0 || saved.unlocked?.carrot === true,
+      hand: legacyHandLevel > 0 || saved.unlocked?.hand === true
+    },
+    settings: {
+      soundEnabled: saved.soundEnabled ?? saved.sound ?? true,
+      selectedSound: saved.selectedSound ?? soundPresets[clamp(soundIndex, 0, soundPresets.length - 1)].id,
+      selectedBackground: null
     },
     stats: {
-      totalClicks: 0,
-      totalRabbitsEarned: Math.max(0, Number(saved.rabbits) || 0)
+      ...defaultState.stats,
+      totalClicks: Number(saved.stats?.totalClicks) || 0,
+      totalRabbitsEarned: Math.max(0, Number(saved.stats?.totalRabbitsEarned ?? saved.rabbits) || 0),
+      maxRabbitsHeld: Math.max(0, Number(saved.rabbits) || 0)
     },
     updatedAt: Date.now()
   };
@@ -151,16 +215,44 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function currentCarrot() {
-  return state.carrotTier >= 0 ? carrotTiers[state.carrotTier] : null;
+function calcCarrotCost(level = state.upgrades.carrotLevel) {
+  return Math.floor(10 * Math.pow(1.17, level));
 }
 
-function currentHand() {
-  return handTiers[state.handTier];
+function calcCarrotUPS(level = state.upgrades.carrotLevel) {
+  let total = 0;
+  for (let i = 0; i < level; i += 1) {
+    total += 0.2 * Math.pow(1.1, i);
+  }
+  return total;
+}
+
+function calcHandCost(level = state.upgrades.handLevel) {
+  return Math.floor(15 * Math.pow(1.2, level));
+}
+
+function calcHandUPC(level = state.upgrades.handLevel) {
+  return Math.floor(1 + 0.75 * Math.pow(level, 1.35));
+}
+
+function calcFarmMultiplier() {
+  return 1;
+}
+
+function calcFriendRate() {
+  return state.upgrades.friendLevel * 0.05;
+}
+
+function currentCarrotRank() {
+  return carrotRanks.find((rank) => state.upgrades.carrotLevel >= rank.min);
+}
+
+function currentHandRank() {
+  return handRanks.find((rank) => state.upgrades.handLevel >= rank.min);
 }
 
 function selectedSoundIndex() {
-  return Math.max(0, soundPresets.findIndex((preset) => preset.id === state.selectedSound));
+  return Math.max(0, soundPresets.findIndex((preset) => preset.id === state.settings.selectedSound));
 }
 
 function formatNumber(value) {
@@ -186,44 +278,60 @@ function formatRabbits(value) {
   return `${formatNumber(value)}羽`;
 }
 
-function currentUps() {
-  return currentCarrot()?.gain ?? 0;
+function currentUpc() {
+  return calcHandUPC();
 }
 
-function currentUpc() {
-  return currentHand().gain;
+function currentUps() {
+  const carrotUPS = calcCarrotUPS() * calcFarmMultiplier();
+  const friendUPS = currentUpc() * calcFriendRate();
+  return carrotUPS + friendUPS;
+}
+
+function updateUnlocks() {
+  if (state.stats.totalClicks >= 10) state.unlocks.carrot = true;
+  if (state.rabbits >= 30 || state.upgrades.handLevel > 0) state.unlocks.hand = true;
+  if (state.rabbits >= 80 || state.upgrades.farmLevel > 0) state.unlocks.farm = true;
+  if (state.rabbits >= 150 || state.upgrades.friendLevel > 0) state.unlocks.friend = true;
+  if (state.rabbits >= 1000) state.unlocks.achievements = true;
 }
 
 function render() {
-  const carrot = currentCarrot();
-  const nextCarrot = carrotTiers[state.carrotTier + 1];
-  const nextHand = handTiers[state.handTier + 1];
+  updateUnlocks();
+  const carrotRank = currentCarrotRank();
+  const handRank = currentHandRank();
+  const carrotCost = calcCarrotCost();
+  const handCost = calcHandCost();
 
   els.rabbitCount.textContent = formatRabbits(state.rabbits);
   els.perSecond.textContent = `毎秒 +${formatRabbits(currentUps())}`;
-  els.carrotName.textContent = carrot?.name ?? "にんじん未解放";
-  els.carrotHint.textContent = carrot
-    ? `毎秒 +${formatRabbits(carrot.gain)}`
-    : "まずは10回ほどなでて解放";
+  els.carrotName.textContent = state.unlocks.carrot ? carrotRank.name : "にんじん未解放";
+  els.carrotHint.textContent = state.unlocks.carrot
+    ? `Lv.${state.upgrades.carrotLevel} / 毎秒 +${formatRabbits(calcCarrotUPS())}`
+    : "10回なでると解放";
+  els.carrotGem.className = `carrot ${carrotRank.className}`;
 
-  els.carrotGem.className = `carrot ${carrot?.className ?? "carrot-normal carrot-locked"}`;
+  els.carrotUpgrade.disabled = !state.unlocks.carrot || state.rabbits < carrotCost;
+  els.carrotUpgradeText.textContent = state.unlocks.carrot
+    ? `${carrotRank.name} Lv.${state.upgrades.carrotLevel + 1}`
+    : "まずは10回なでて解放";
+  els.carrotCost.textContent = state.unlocks.carrot ? formatRabbits(carrotCost) : "LOCK";
 
-  els.carrotUpgrade.disabled = !nextCarrot || state.rabbits < nextCarrot.cost;
-  els.carrotUpgradeText.textContent = nextCarrot ? `${nextCarrot.name}を解放` : "最高ランクです";
-  els.carrotCost.textContent = nextCarrot ? formatRabbits(nextCarrot.cost) : "MAX";
+  els.handUpgrade.disabled = !state.unlocks.hand || state.rabbits < handCost;
+  els.handUpgradeText.textContent = state.unlocks.hand
+    ? `${handRank.name} Lv.${state.upgrades.handLevel + 1} / なでる +${formatRabbits(currentUpc())}`
+    : "30羽で解放";
+  els.handCost.textContent = state.unlocks.hand ? formatRabbits(handCost) : "LOCK";
 
-  els.handUpgrade.disabled = !nextHand || state.rabbits < nextHand.cost;
-  els.handUpgradeText.textContent = nextHand ? `${nextHand.name}へ強化` : "最高ランクです";
-  els.handCost.textContent = nextHand ? formatRabbits(nextHand.cost) : "MAX";
-
-  els.soundToggle.textContent = state.soundEnabled ? "♪" : "×";
-  els.soundToggle.setAttribute("aria-label", state.soundEnabled ? "音をオフにする" : "音をオンにする");
+  els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
+  els.soundToggle.setAttribute("aria-label", state.settings.soundEnabled ? "音をオフにする" : "音をオンにする");
   els.soundVariant.textContent = soundPresets[selectedSoundIndex()].label;
 }
 
 function addRabbits(amount) {
   state.rabbits += amount;
   state.stats.totalRabbitsEarned += amount;
+  state.stats.maxRabbitsHeld = Math.max(state.stats.maxRabbitsHeld, state.rabbits);
 }
 
 function petRabbit(event) {
@@ -233,6 +341,7 @@ function petRabbit(event) {
   addVisualRabbit();
   spawnFloat(gain, event);
   playPyon();
+  checkMessages();
   saveState();
   render();
 }
@@ -279,24 +388,43 @@ function spawnFloat(amount, event) {
 }
 
 function upgradeCarrot() {
-  const next = carrotTiers[state.carrotTier + 1];
-  if (!next || state.rabbits < next.cost) return;
-  state.rabbits -= next.cost;
-  state.carrotTier += 1;
-  state.unlocked.carrot = true;
+  const cost = calcCarrotCost();
+  if (!state.unlocks.carrot || state.rabbits < cost) return;
+  state.rabbits -= cost;
+  state.upgrades.carrotLevel += 1;
   playPyon(1.08);
+  checkMessages();
   saveState();
   render();
 }
 
 function upgradeHand() {
-  const next = handTiers[state.handTier + 1];
-  if (!next || state.rabbits < next.cost) return;
-  state.rabbits -= next.cost;
-  state.handTier += 1;
+  const cost = calcHandCost();
+  if (!state.unlocks.hand || state.rabbits < cost) return;
+  state.rabbits -= cost;
+  state.upgrades.handLevel += 1;
   playPyon(1.16);
+  checkMessages();
   saveState();
   render();
+}
+
+function checkMessages() {
+  for (const rule of messageRules) {
+    if (state.seenMessages.includes(rule.id) || !rule.test(state)) continue;
+    state.seenMessages.push(rule.id);
+    showMessage(rule.text);
+    break;
+  }
+}
+
+function showMessage(text) {
+  clearTimeout(messageTimer);
+  els.farmMessage.textContent = text;
+  els.farmMessage.classList.add("farm-message-visible");
+  messageTimer = setTimeout(() => {
+    els.farmMessage.classList.remove("farm-message-visible");
+  }, 3200);
 }
 
 function ensureAudio() {
@@ -331,7 +459,7 @@ function createPyonBuffer(preset) {
 }
 
 function playPyon(rate = 1) {
-  if (!state.soundEnabled) return;
+  if (!state.settings.soundEnabled) return;
   ensureAudio();
 
   const source = audioContext.createBufferSource();
@@ -348,8 +476,7 @@ function resetGame() {
   if (!confirm("うさぎの数と強化をリセットしますか？")) return;
   state = {
     ...createDefaultState(),
-    soundEnabled: state.soundEnabled,
-    selectedSound: state.selectedSound
+    settings: { ...createDefaultState().settings, ...state.settings }
   };
   saveState();
   render();
@@ -369,6 +496,7 @@ function tick(now) {
     lastUiUpdate = now;
   }
   if (now - lastAutoSave > 1000) {
+    checkMessages();
     saveState();
     lastAutoSave = now;
   }
@@ -385,14 +513,14 @@ els.farm.addEventListener("keydown", (event) => {
 els.carrotUpgrade.addEventListener("click", upgradeCarrot);
 els.handUpgrade.addEventListener("click", upgradeHand);
 els.soundToggle.addEventListener("click", () => {
-  state.soundEnabled = !state.soundEnabled;
+  state.settings.soundEnabled = !state.settings.soundEnabled;
   saveState();
   render();
 });
 els.sampleSound.addEventListener("click", () => playPyon());
 els.soundVariant.addEventListener("click", () => {
   const nextIndex = (selectedSoundIndex() + 1) % soundPresets.length;
-  state.selectedSound = soundPresets[nextIndex].id;
+  state.settings.selectedSound = soundPresets[nextIndex].id;
   saveState();
   render();
   playPyon();

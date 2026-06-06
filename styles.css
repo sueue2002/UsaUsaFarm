@@ -82,7 +82,11 @@ h1 {
 }
 
 .level-card {
+  position: relative;
   min-height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 10px 12px;
   border: 2px solid rgba(255, 255, 255, 0.75);
   border-radius: 8px;
@@ -182,12 +186,12 @@ h1 {
 }
 
 .visual-rabbit::after {
-  left: 10%;
-  right: 20%;
-  bottom: 0px;
-  height: 15px;
+  left: 17%;
+  right: 17%;
+  bottom: 1px;
+  height: 7px;
   border-radius: 999px;
-  background: rgba(210, 70, 200, 0.40);
+  background: rgba(255, 176, 204, 0.38);
 }
 
 .visual-rabbit-left {
@@ -206,6 +210,23 @@ h1 {
   box-shadow: inset -10px -12px rgba(83, 74, 94, 0.12);
   opacity: 0.88;
   pointer-events: none;
+}
+
+.carrot-card-gem {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 48px;
+  transform: rotate(20deg);
+}
+
+.carrot-card-gem::before {
+  top: -14px;
+  left: 7px;
+  width: 18px;
+  height: 20px;
 }
 
 .carrot::before {
@@ -244,6 +265,31 @@ h1 {
   font-size: 1.15rem;
   font-weight: 900;
   transform: translate(-50%, -50%);
+}
+
+.farm-message {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  z-index: 5;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.86);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+
+.farm-message-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .upgrade-panel {

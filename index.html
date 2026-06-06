@@ -23,14 +23,17 @@
         </div>
         <div id="visualRabbitLayer" class="visual-rabbit-layer" aria-hidden="true"></div>
         <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
-        <span id="carrotGem" class="carrot carrot-normal" aria-hidden="true"></span>
+        <p id="farmMessage" class="farm-message" aria-live="polite"></p>
       </section>
 
       <section class="upgrade-panel" aria-label="強化">
         <div class="level-card">
-          <span class="label">にんじん</span>
-          <strong id="carrotName">ふつうのにんじん</strong>
-          <span id="carrotHint">毎秒 +0.2</span>
+          <span id="carrotGem" class="carrot carrot-normal carrot-card-gem" aria-hidden="true"></span>
+          <div>
+            <span class="label">にんじん</span>
+            <strong id="carrotName">にんじん未解放</strong>
+            <span id="carrotHint">10回なでると解放</span>
+          </div>
         </div>
 
         <button id="carrotUpgrade" class="upgrade-button" type="button">
