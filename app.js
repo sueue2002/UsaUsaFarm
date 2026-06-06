@@ -1,7 +1,7 @@
 const STORAGE_KEY = "usa-usa-farm-state-v1";
 const BACKUP_KEY = `${STORAGE_KEY}-backup`;
 const SAVE_VERSION = 2;
-const MAX_VISUAL_RABBITS = 120;
+const MAX_VISUAL_RABBITS = 300;
 const VISUAL_RABBIT_PADDING = 26;
 const VISUAL_RABBIT_TOP_GAP = 18;
 
@@ -31,6 +31,16 @@ const soundPresets = [
   { id: "C", label: "音色 C", start: 620, mid: 560, end: 880, duration: 0.22, volume: 0.13 }
 ];
 
+const farmTiers = [
+  { name: "うさぎ小屋", cost: 0, multiplier: 1, visualLimit: 30, className: "farm-stage-hutch" },
+  { name: "ちいさなお庭", cost: 80, multiplier: 1.25, visualLimit: 50, className: "farm-stage-garden" },
+  { name: "花いっぱいのお庭", cost: 450, multiplier: 1.6, visualLimit: 70, className: "farm-stage-flowers" },
+  { name: "うさぎ公園", cost: 2400, multiplier: 2.05, visualLimit: 120, className: "farm-stage-park" },
+  { name: "ひろい草原", cost: 15000, multiplier: 2.7, visualLimit: 170, className: "farm-stage-meadow" },
+  { name: "うさぎの丘", cost: 90000, multiplier: 3.6, visualLimit: 230, className: "farm-stage-hill" },
+  { name: "うさぎ王国", cost: 600000, multiplier: 4.8, visualLimit: 300, className: "farm-stage-kingdom" }
+];
+
 const messageRules = [
   { id: "clicks-10", test: (s) => s.stats.totalClicks >= 10, text: "うさぎがあつまってきた！" },
   { id: "rabbits-50", test: (s) => s.rabbits >= 50, text: "ちいさなふぁーむがにぎやかになってきた" },
@@ -38,7 +48,9 @@ const messageRules = [
   { id: "rabbits-1k", test: (s) => s.rabbits >= 1000, text: "うさぎでいっぱい！" },
   { id: "rabbits-10k", test: (s) => s.rabbits >= 10000, text: "ふぁーむがふわふわに包まれている" },
   { id: "carrot-10", test: (s) => s.upgrades.carrotLevel >= 10, text: "ルビーのにんじんを見つけた！" },
-  { id: "hand-10", test: (s) => s.upgrades.handLevel >= 10, text: "なでるのが上手になってきた" }
+  { id: "hand-10", test: (s) => s.upgrades.handLevel >= 10, text: "なでるのが上手になってきた" },
+  { id: "friend-1", test: (s) => s.upgrades.friendLevel >= 1, text: "おともだちが手伝いにきた！" },
+  { id: "farm-1", test: (s) => s.upgrades.farmLevel >= 1, text: "ちいさなお庭に広がった！" }
 ];
 
 const defaultState = {
@@ -95,6 +107,12 @@ const els = {
   handUpgrade: document.getElementById("handUpgrade"),
   handUpgradeText: document.getElementById("handUpgradeText"),
   handCost: document.getElementById("handCost"),
+  farmUpgrade: document.getElementById("farmUpgrade"),
+  farmUpgradeText: document.getElementById("farmUpgradeText"),
+  farmCost: document.getElementById("farmCost"),
+  friendUpgrade: document.getElementById("friendUpgrade"),
+  friendUpgradeText: document.getElementById("friendUpgradeText"),
+  friendCost: document.getElementById("friendCost"),
   farm: document.getElementById("farm"),
   farmStats: document.getElementById("farmStats"),
   farmMessage: document.getElementById("farmMessage"),
@@ -237,11 +255,23 @@ function calcHandUPC(level = state.upgrades.handLevel) {
 }
 
 function calcFarmMultiplier() {
-  return 1;
+  return farmTiers[state.upgrades.farmLevel]?.multiplier ?? 1;
 }
 
 function calcFriendRate() {
   return state.upgrades.friendLevel * 0.05;
+}
+
+function calcFriendCost(level = state.upgrades.friendLevel) {
+  return Math.floor(150 * Math.pow(1.25, level));
+}
+
+function currentFarmTier() {
+  return farmTiers[state.upgrades.farmLevel] ?? farmTiers[0];
+}
+
+function nextFarmTier() {
+  return farmTiers[state.upgrades.farmLevel + 1] ?? null;
 }
 
 function currentCarrotRank() {
@@ -309,11 +339,15 @@ function render() {
   const handRank = currentHandRank();
   const carrotCost = calcCarrotCost();
   const handCost = calcHandCost();
+  const farmTier = currentFarmTier();
+  const nextFarm = nextFarmTier();
+  const friendCost = calcFriendCost();
 
   els.farmNameButton.textContent = state.settings.farmName;
   document.title = state.settings.farmName;
   els.rabbitCount.textContent = formatRabbits(state.rabbits, { precise: true });
   els.perSecond.textContent = `毎秒 +${formatRabbits(currentUps(), { precise: true })}`;
+  els.farm.className = `farm ${farmTier.className}`;
   els.carrotGem.className = `carrot carrot-card-gem ${carrotRank.className}`;
 
   els.carrotUpgrade.disabled = !state.unlocks.carrot || state.rabbits < carrotCost;
@@ -327,6 +361,22 @@ function render() {
     ? `${handRank.name} Lv.${state.upgrades.handLevel + 1} / なでる +${formatRabbits(currentUpc())}`
     : "30羽で解放";
   els.handCost.textContent = state.unlocks.hand ? formatRabbits(handCost) : "LOCK";
+
+  els.farmUpgrade.disabled = !state.unlocks.farm || !nextFarm || state.rabbits < nextFarm.cost;
+  els.farmUpgradeText.textContent = state.unlocks.farm
+    ? nextFarm
+      ? `${nextFarm.name}へ / にんじん x${nextFarm.multiplier.toFixed(2)}`
+      : `${farmTier.name} / 最高ランク`
+    : "80羽で解放";
+  els.farmCost.textContent = state.unlocks.farm
+    ? nextFarm ? formatRabbits(nextFarm.cost) : "MAX"
+    : "LOCK";
+
+  els.friendUpgrade.disabled = !state.unlocks.friend || state.rabbits < friendCost;
+  els.friendUpgradeText.textContent = state.unlocks.friend
+    ? `Lv.${state.upgrades.friendLevel + 1} / 毎秒 ${calcFriendRate().toFixed(2)}回ぶん`
+    : "150羽で解放";
+  els.friendCost.textContent = state.unlocks.friend ? formatRabbits(friendCost) : "LOCK";
 
   els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
   els.soundToggle.setAttribute("aria-label", state.settings.soundEnabled ? "音をオフにする" : "音をオンにする");
@@ -372,7 +422,8 @@ function addVisualRabbit() {
   els.visualRabbitLayer.appendChild(rabbit);
   visualRabbits.push(rabbit);
 
-  while (visualRabbits.length > MAX_VISUAL_RABBITS) {
+  const visualLimit = Math.min(MAX_VISUAL_RABBITS, currentFarmTier().visualLimit);
+  while (visualRabbits.length > visualLimit) {
     visualRabbits.shift()?.remove();
   }
 }
@@ -409,6 +460,29 @@ function upgradeHand() {
   state.rabbits -= cost;
   state.upgrades.handLevel += 1;
   playPyon(1.16);
+  checkMessages();
+  saveState();
+  render();
+}
+
+function upgradeFarm() {
+  const next = nextFarmTier();
+  if (!state.unlocks.farm || !next || state.rabbits < next.cost) return;
+  state.rabbits -= next.cost;
+  state.upgrades.farmLevel += 1;
+  state.unlockedBackgrounds = [...new Set([...state.unlockedBackgrounds, next.className])];
+  playPyon(1.12);
+  checkMessages();
+  saveState();
+  render();
+}
+
+function upgradeFriend() {
+  const cost = calcFriendCost();
+  if (!state.unlocks.friend || state.rabbits < cost) return;
+  state.rabbits -= cost;
+  state.upgrades.friendLevel += 1;
+  playPyon(1.2);
   checkMessages();
   saveState();
   render();
@@ -517,6 +591,8 @@ els.farm.addEventListener("keydown", (event) => {
 });
 els.carrotUpgrade.addEventListener("click", upgradeCarrot);
 els.handUpgrade.addEventListener("click", upgradeHand);
+els.farmUpgrade.addEventListener("click", upgradeFarm);
+els.friendUpgrade.addEventListener("click", upgradeFriend);
 els.farmNameButton.addEventListener("click", () => {
   const nextName = prompt("ふぁーむ名を入力してください", state.settings.farmName);
   if (nextName === null) return;
