@@ -3,6 +3,7 @@ const BACKUP_KEY = `${STORAGE_KEY}-backup`;
 const SAVE_VERSION = 1;
 const MAX_VISUAL_RABBITS = 120;
 const VISUAL_RABBIT_PADDING = 26;
+const VISUAL_RABBIT_TOP_GAP = 18;
 
 const carrotTiers = [
   { name: "ふつうのにんじん", className: "carrot-normal", gain: 0.2, cost: 10 },
@@ -24,9 +25,9 @@ const handTiers = [
 ];
 
 const soundPresets = [
-  { id: "A", label: "音色 A", start: 520, mid: 610, end: 760, duration: 0.18, volume: 0.18 },
-  { id: "B", label: "音色 B", start: 470, mid: 650, end: 920, duration: 0.16, volume: 0.15 },
-  { id: "C", label: "音色 C", start: 620, mid: 560, end: 880, duration: 0.22, volume: 0.13 }
+  { id: "A", label: "ぴょんっ！", start: 520, mid: 610, end: 760, duration: 0.18, volume: 0.18 },
+  { id: "B", label: "ぴょいっ！", start: 470, mid: 650, end: 920, duration: 0.16, volume: 0.15 },
+  { id: "C", label: "ぴょこっ！", start: 620, mid: 560, end: 880, duration: 0.22, volume: 0.13 }
 ];
 
 const defaultState = {
@@ -68,6 +69,7 @@ const els = {
   handUpgradeText: document.getElementById("handUpgradeText"),
   handCost: document.getElementById("handCost"),
   farm: document.getElementById("farm"),
+  farmStats: document.getElementById("farmStats"),
   visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
@@ -237,23 +239,20 @@ function petRabbit(event) {
 
 function addVisualRabbit() {
   const rect = els.farm.getBoundingClientRect();
+  const statsRect = els.farmStats.getBoundingClientRect();
+  const minY = Math.max(
+    VISUAL_RABBIT_PADDING,
+    statsRect.bottom - rect.top + VISUAL_RABBIT_TOP_GAP
+  );
+  const safeMinY = Math.min(minY, Math.max(VISUAL_RABBIT_PADDING, rect.height - VISUAL_RABBIT_PADDING));
   const maxX = Math.max(0, rect.width - VISUAL_RABBIT_PADDING * 2);
-  const maxY = Math.max(0, rect.height - VISUAL_RABBIT_PADDING * 2);
+  const maxY = Math.max(0, rect.height - safeMinY - VISUAL_RABBIT_PADDING);
   const rabbit = document.createElement("span");
-  const scale = 0.82 + Math.random() * 0.36;
   const direction = Math.random() < 0.5 ? "left" : "right";
 
   rabbit.className = `visual-rabbit visual-rabbit-${direction}`;
-  rabbit.innerHTML = `
-    <span class="visual-rabbit-tail"></span>
-    <span class="visual-rabbit-body"></span>
-    <span class="visual-rabbit-head"></span>
-    <span class="visual-rabbit-ear visual-rabbit-ear-back"></span>
-    <span class="visual-rabbit-ear visual-rabbit-ear-front"></span>
-  `;
   rabbit.style.left = `${VISUAL_RABBIT_PADDING + Math.random() * maxX}px`;
-  rabbit.style.top = `${VISUAL_RABBIT_PADDING + Math.random() * maxY}px`;
-  rabbit.style.setProperty("--rabbit-scale", scale.toFixed(2));
+  rabbit.style.top = `${safeMinY + Math.random() * maxY}px`;
   rabbit.style.setProperty("--rabbit-tilt", `${Math.random() * 18 - 9}deg`);
 
   els.visualRabbitLayer.appendChild(rabbit);

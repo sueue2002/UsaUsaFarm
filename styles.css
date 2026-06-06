@@ -164,65 +164,34 @@ h1 {
 
 .visual-rabbit {
   position: absolute;
-  width: 48px;
-  height: 34px;
-  transform: translate(-50%, -50%) rotate(var(--rabbit-tilt)) scale(var(--rabbit-scale));
+  width: 46px;
+  height: 42px;
+  transform: translate(-50%, -50%) rotate(var(--rabbit-tilt));
 }
 
-.visual-rabbit-body,
-.visual-rabbit-head,
-.visual-rabbit-ear,
-.visual-rabbit-tail {
+.visual-rabbit::before,
+.visual-rabbit::after {
+  content: "";
   position: absolute;
-  display: block;
-  background: #ffffff;
-  box-shadow: 0 3px 0 rgba(120, 90, 110, 0.13);
 }
 
-.visual-rabbit-body {
-  left: 11px;
-  bottom: 4px;
-  width: 28px;
-  height: 20px;
-  border-radius: 52% 46% 48% 54% / 58% 58% 42% 42%;
+.visual-rabbit::before {
+  inset: 0;
+  z-index: 1;
+  background: url("usagi.svg") center / contain no-repeat;
 }
 
-.visual-rabbit-head {
-  right: 3px;
-  bottom: 9px;
-  width: 17px;
-  height: 16px;
-  border-radius: 56% 48% 48% 56%;
-}
-
-.visual-rabbit-ear {
-  right: 11px;
-  top: 2px;
-  width: 7px;
-  height: 20px;
+.visual-rabbit::after {
+  left: 10%;
+  right: 20%;
+  bottom: 0px;
+  height: 15px;
   border-radius: 999px;
-  transform-origin: 50% 100%;
-}
-
-.visual-rabbit-ear-back {
-  right: 16px;
-  transform: rotate(-20deg);
-}
-
-.visual-rabbit-ear-front {
-  transform: rotate(13deg);
-}
-
-.visual-rabbit-tail {
-  left: 4px;
-  bottom: 9px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  background: rgba(210, 70, 200, 0.40);
 }
 
 .visual-rabbit-left {
-  transform: translate(-50%, -50%) rotate(var(--rabbit-tilt)) scaleX(-1) scale(var(--rabbit-scale));
+  transform: translate(-50%, -50%) rotate(var(--rabbit-tilt)) scaleX(-1);
 }
 
 .carrot {
