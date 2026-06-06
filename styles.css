@@ -53,6 +53,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .eyebrow {
@@ -70,8 +71,27 @@ h1 {
   line-height: 1;
 }
 
+.farm-name-button {
+  max-width: min(64vw, 280px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 900;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .icon-button,
-.controls button {
+.reset-zone button {
   min-width: 44px;
   min-height: 44px;
   border: 0;
@@ -81,17 +101,11 @@ h1 {
   cursor: pointer;
 }
 
-.level-card {
-  position: relative;
-  min-height: 70px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 8px;
-  background: rgba(255, 253, 248, 0.86);
-  box-shadow: 0 10px 22px rgba(126, 95, 116, 0.12);
+.sound-variant-button {
+  min-width: 72px;
+  padding: 0 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .label {
@@ -130,9 +144,10 @@ h1 {
   z-index: 3;
   min-height: 58px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: center;
+  gap: 3px;
   padding: 10px 12px;
   border: 2px solid rgba(255, 255, 255, 0.75);
   border-radius: 8px;
@@ -144,13 +159,14 @@ h1 {
 .farm-stats strong {
   overflow-wrap: anywhere;
   font-size: clamp(1.28rem, 7vw, 1.9rem);
+  line-height: 1.05;
 }
 
 .farm-stats span {
-  flex: 0 0 auto;
   color: var(--soft);
   font-size: 0.95rem;
   font-weight: 800;
+  line-height: 1.1;
 }
 
 .float-layer {
@@ -297,17 +313,6 @@ h1 {
   gap: 8px;
 }
 
-.level-card strong,
-.level-card span:last-child {
-  display: block;
-}
-
-.level-card span:last-child {
-  margin-top: 4px;
-  color: var(--soft);
-  font-size: 0.86rem;
-}
-
 .upgrade-button {
   min-height: 66px;
   display: flex;
@@ -341,10 +346,16 @@ h1 {
   text-align: center;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+.reset-zone {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 26vh;
+  padding-bottom: 18px;
+}
+
+.reset-zone button {
+  min-width: 96px;
+  opacity: 0.72;
 }
 
 @keyframes floatUp {

@@ -61,7 +61,8 @@ const defaultState = {
   settings: {
     soundEnabled: true,
     selectedSound: "C",
-    selectedBackground: null
+    selectedBackground: null,
+    farmName: "うさうさふぁーむ"
   },
   stats: {
     totalClicks: 0,
@@ -84,11 +85,10 @@ let lastAutoSave = performance.now();
 let lastUiUpdate = performance.now();
 
 const els = {
+  farmNameButton: document.getElementById("farmNameButton"),
   rabbitCount: document.getElementById("rabbitCount"),
   perSecond: document.getElementById("perSecond"),
   carrotGem: document.getElementById("carrotGem"),
-  carrotName: document.getElementById("carrotName"),
-  carrotHint: document.getElementById("carrotHint"),
   carrotUpgrade: document.getElementById("carrotUpgrade"),
   carrotUpgradeText: document.getElementById("carrotUpgradeText"),
   carrotCost: document.getElementById("carrotCost"),
@@ -101,7 +101,6 @@ const els = {
   visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
-  sampleSound: document.getElementById("sampleSound"),
   soundVariant: document.getElementById("soundVariant"),
   resetGame: document.getElementById("resetGame")
 };
@@ -158,7 +157,8 @@ function normalizeV2State(saved) {
     settings: {
       soundEnabled: saved.settings?.soundEnabled !== false,
       selectedSound,
-      selectedBackground: saved.settings?.selectedBackground ?? null
+      selectedBackground: saved.settings?.selectedBackground ?? null,
+      farmName: String(saved.settings?.farmName || defaultState.settings.farmName).slice(0, 24)
     },
     stats: {
       totalClicks: Math.max(0, Number(saved.stats?.totalClicks) || 0),
@@ -198,7 +198,8 @@ function migrateLegacyState(saved) {
     settings: {
       soundEnabled: saved.soundEnabled ?? saved.sound ?? true,
       selectedSound: saved.selectedSound ?? soundPresets[clamp(soundIndex, 0, soundPresets.length - 1)].id,
-      selectedBackground: null
+      selectedBackground: null,
+      farmName: defaultState.settings.farmName
     },
     stats: {
       ...defaultState.stats,
@@ -255,10 +256,16 @@ function selectedSoundIndex() {
   return Math.max(0, soundPresets.findIndex((preset) => preset.id === state.settings.selectedSound));
 }
 
-function formatNumber(value) {
+function formatNumber(value, options = {}) {
   const abs = Math.abs(value);
   if (abs < 1000) {
-    return value.toLocaleString("ja-JP", { maximumFractionDigits: value < 10 ? 1 : 0 });
+    const digits = options.precise
+      ? (abs < 100 ? 2 : 1)
+      : 0;
+    return value.toLocaleString("ja-JP", {
+      minimumFractionDigits: options.precise && abs > 0 && abs < 10 ? 2 : 0,
+      maximumFractionDigits: digits
+    });
   }
 
   const units = ["k", "M", "G", "T", "P", "E"];
@@ -274,8 +281,8 @@ function formatNumber(value) {
   })}${units[unitIndex]}`;
 }
 
-function formatRabbits(value) {
-  return `${formatNumber(value)}羽`;
+function formatRabbits(value, options = {}) {
+  return `${formatNumber(value, options)}羽`;
 }
 
 function currentUpc() {
@@ -303,17 +310,15 @@ function render() {
   const carrotCost = calcCarrotCost();
   const handCost = calcHandCost();
 
-  els.rabbitCount.textContent = formatRabbits(state.rabbits);
-  els.perSecond.textContent = `毎秒 +${formatRabbits(currentUps())}`;
-  els.carrotName.textContent = state.unlocks.carrot ? carrotRank.name : "にんじん未解放";
-  els.carrotHint.textContent = state.unlocks.carrot
-    ? `Lv.${state.upgrades.carrotLevel} / 毎秒 +${formatRabbits(calcCarrotUPS())}`
-    : "10回なでると解放";
-  els.carrotGem.className = `carrot ${carrotRank.className}`;
+  els.farmNameButton.textContent = state.settings.farmName;
+  document.title = state.settings.farmName;
+  els.rabbitCount.textContent = formatRabbits(state.rabbits, { precise: true });
+  els.perSecond.textContent = `毎秒 +${formatRabbits(currentUps(), { precise: true })}`;
+  els.carrotGem.className = `carrot carrot-card-gem ${carrotRank.className}`;
 
   els.carrotUpgrade.disabled = !state.unlocks.carrot || state.rabbits < carrotCost;
   els.carrotUpgradeText.textContent = state.unlocks.carrot
-    ? `${carrotRank.name} Lv.${state.upgrades.carrotLevel + 1}`
+    ? `${carrotRank.name} Lv.${state.upgrades.carrotLevel + 1} / 毎秒 +${formatRabbits(calcCarrotUPS(), { precise: true })}`
     : "まずは10回なでて解放";
   els.carrotCost.textContent = state.unlocks.carrot ? formatRabbits(carrotCost) : "LOCK";
 
@@ -512,12 +517,20 @@ els.farm.addEventListener("keydown", (event) => {
 });
 els.carrotUpgrade.addEventListener("click", upgradeCarrot);
 els.handUpgrade.addEventListener("click", upgradeHand);
+els.farmNameButton.addEventListener("click", () => {
+  const nextName = prompt("ふぁーむ名を入力してください", state.settings.farmName);
+  if (nextName === null) return;
+  const trimmed = nextName.trim();
+  if (!trimmed) return;
+  state.settings.farmName = trimmed.slice(0, 24);
+  saveState();
+  render();
+});
 els.soundToggle.addEventListener("click", () => {
   state.settings.soundEnabled = !state.settings.soundEnabled;
   saveState();
   render();
 });
-els.sampleSound.addEventListener("click", () => playPyon());
 els.soundVariant.addEventListener("click", () => {
   const nextIndex = (selectedSoundIndex() + 1) % soundPresets.length;
   state.settings.selectedSound = soundPresets[nextIndex].id;
