@@ -292,6 +292,18 @@ h1 {
   background: url("usagi.svg") center / contain no-repeat;
 }
 
+.visual-rabbit-brown::before {
+  filter: sepia(0.9) saturate(1.25) brightness(0.86);
+}
+
+.visual-rabbit-pink::before {
+  filter: sepia(0.25) saturate(1.6) hue-rotate(290deg) brightness(1.08);
+}
+
+.visual-rabbit-cream::before {
+  filter: sepia(0.45) saturate(0.8) brightness(1.08);
+}
+
 .visual-rabbit::after {
   left: 17%;
   right: 17%;
@@ -497,9 +509,19 @@ h1 {
   cursor: not-allowed;
 }
 
+.farm-tier-unlocked,
+.farm-tier-next:not(:disabled) {
+  background: var(--lemon);
+}
+
+.farm-tier-unlocked small,
+.farm-tier-next:not(:disabled) small {
+  color: #8b6b22;
+}
+
 .farm-tier-selected {
   outline: 2px solid #ff9ec0;
-  background: #fff8fc;
+  background: #fff8d8;
 }
 
 .upgrade-button {

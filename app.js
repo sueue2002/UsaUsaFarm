@@ -8,6 +8,7 @@ const CLOVER_VISIBLE_MS = 10000;
 const CLOVER_SPAWN_CHANCE = 0.006;
 const FIVE_LEAF_SPAWN_CHANCE = 0.0004;
 const CLOVER_COOLDOWN_MS = 60000;
+const FRIEND_RABBIT_CHANCE = 0.08;
 
 const carrotRanks = [
   { min: 95, name: "ダイヤのにんじん", className: "carrot-diamond" },
@@ -27,6 +28,20 @@ const handRanks = [
   { min: 12, name: "ぽかぽかミトン" },
   { min: 5, name: "ふわふわ手袋" },
   { min: 0, name: "そっとなでる" }
+];
+
+const friendRanks = [
+  { min: 40, name: "ほしぞらうさぎがやってくるようになった" },
+  { min: 25, name: "くりーむうさぎがやってくるようになった" },
+  { min: 12, name: "ももいろうさぎがやってくるようになった" },
+  { min: 1, name: "ちゃいろうさぎがやってくるようになった" },
+  { min: 0, name: "おともだちはまだいない" }
+];
+
+const friendRabbitClasses = [
+  { min: 25, className: "visual-rabbit-cream" },
+  { min: 12, className: "visual-rabbit-pink" },
+  { min: 1, className: "visual-rabbit-brown" }
 ];
 
 const soundPresets = [
@@ -305,6 +320,10 @@ function currentHandRank() {
   return handRanks.find((rank) => state.upgrades.handLevel >= rank.min);
 }
 
+function currentFriendRank() {
+  return friendRanks.find((rank) => state.upgrades.friendLevel >= rank.min);
+}
+
 function selectedSoundIndex() {
   return Math.max(0, soundPresets.findIndex((preset) => preset.id === state.settings.selectedSound));
 }
@@ -394,14 +413,15 @@ function render() {
   const farmTier = currentFarmTier();
   const displayTier = displayedFarmTier();
   const friendCost = calcFriendCost();
-  const hasBoost = Boolean(state.activeBoost && state.activeBoost.expiresAt > Date.now());
+  const boostType = activeBoostType();
 
   els.farmNameButton.textContent = state.settings.farmName;
   document.title = state.settings.farmName;
   els.rabbitCount.textContent = formatRabbitCount(state.rabbits);
   els.perSecond.textContent = `毎秒 +${formatRate(currentUps())}`;
-  els.perSecond.classList.toggle("boosted-stat", hasBoost);
-  els.farmStats.classList.toggle("boosted-stat-box", hasBoost);
+  els.rabbitCount.classList.toggle("boosted-stat", boostType === "double");
+  els.perSecond.classList.toggle("boosted-stat", boostType === "ups");
+  els.farmStats.classList.toggle("boosted-stat-box", Boolean(boostType));
   els.farm.className = `farm ${displayTier.className}`;
   els.carrotGem.className = `carrot carrot-card-gem ${carrotRank.className}`;
 
@@ -426,10 +446,10 @@ function render() {
   els.friendUpgradeTitle.textContent = `おともだちLv.${state.upgrades.friendLevel}`;
   els.friendUpgrade.disabled = !state.unlocks.friend || state.rabbits < friendCost;
   els.friendUpgradeText.textContent = state.unlocks.friend
-    ? "おともだち"
+    ? currentFriendRank().name
     : "150羽で解放";
   els.friendCost.textContent = state.unlocks.friend ? formatRabbits(friendCost) : "LOCK";
-  renderBoostIndicator(hasBoost);
+  renderBoostIndicator(Boolean(boostType));
 
   els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
   els.soundToggle.setAttribute("aria-label", state.settings.soundEnabled ? "音をオフにする" : "音をオンにする");
@@ -453,7 +473,7 @@ function renderFarmButtons() {
     const next = index === state.upgrades.farmLevel + 1;
     const selected = displayedFarmTier().className === tier.className;
     button.type = "button";
-    button.className = `farm-tier-button${selected ? " farm-tier-selected" : ""}`;
+    button.className = `farm-tier-button${unlocked ? " farm-tier-unlocked" : ""}${next ? " farm-tier-next" : ""}${selected ? " farm-tier-selected" : ""}`;
     button.dataset.farmIndex = String(index);
     button.disabled = !unlocked && !(next && state.unlocks.farm && state.rabbits >= tier.cost);
     button.innerHTML = `<strong>${tier.name}</strong><small>${unlocked ? (selected ? "表示中" : "切替") : next ? formatRabbits(tier.cost) : "LOCK"}</small>`;
@@ -475,6 +495,14 @@ function renderBoostIndicator(hasBoost) {
   els.boostIndicator.classList.add("boost-indicator-visible");
 }
 
+function activeBoostType() {
+  if (!state.activeBoost || state.activeBoost.expiresAt <= Date.now()) {
+    currentBoost("ups");
+    return null;
+  }
+  return state.activeBoost.type;
+}
+
 function addRabbits(amount) {
   state.rabbits += amount;
   state.stats.totalRabbitsEarned += amount;
@@ -482,10 +510,12 @@ function addRabbits(amount) {
 }
 
 function petRabbit(event) {
-  const gain = currentUpc();
+  let gain = currentUpc();
+  const beforeRabbits = state.rabbits;
   addRabbits(gain);
   if (state.activeBoost?.type === "double" && state.activeBoost.expiresAt > Date.now()) {
     addRabbits(state.rabbits);
+    gain = state.rabbits - beforeRabbits;
   }
   state.stats.totalClicks += 1;
   addVisualRabbit();
@@ -509,8 +539,9 @@ function addVisualRabbit() {
   const maxY = Math.max(0, rect.height - safeMinY - VISUAL_RABBIT_PADDING);
   const rabbit = document.createElement("span");
   const direction = Math.random() < 0.5 ? "left" : "right";
+  const friendClass = pickFriendRabbitClass();
 
-  rabbit.className = `visual-rabbit visual-rabbit-${direction}`;
+  rabbit.className = `visual-rabbit visual-rabbit-${direction}${friendClass ? ` ${friendClass}` : ""}`;
   rabbit.style.left = `${VISUAL_RABBIT_PADDING + Math.random() * maxX}px`;
   rabbit.style.top = `${safeMinY + Math.random() * maxY}px`;
   rabbit.style.setProperty("--rabbit-tilt", `${Math.random() * 18 - 9}deg`);
@@ -524,9 +555,14 @@ function addVisualRabbit() {
   }
 }
 
+function pickFriendRabbitClass() {
+  if (state.upgrades.friendLevel <= 0 || Math.random() > FRIEND_RABBIT_CHANCE) return "";
+  return friendRabbitClasses.find((item) => state.upgrades.friendLevel >= item.min)?.className ?? "";
+}
+
 function spawnFloat(amount, event) {
   const float = document.createElement("span");
-  float.className = `floating-bunny${currentBoost("upc") > 1 || state.activeBoost?.type === "double" ? " floating-bunny-boosted" : ""}`;
+  float.className = `floating-bunny${activeBoostType() === "upc" ? " floating-bunny-boosted" : ""}`;
   float.textContent = `+${formatNumber(amount)}`;
 
   const rect = els.farm.getBoundingClientRect();
@@ -643,10 +679,10 @@ function collectClover(event) {
   state.stats.totalCloverTapped += 1;
   const cloverType = els.cloverButton.dataset.cloverType;
   const boost = cloverType === "five"
-    ? { type: "double", multiplier: 2, duration: 3000 + Math.random() * 2000, label: "いつつば！少しの間、なでるたびに倍！" }
+    ? { type: "double", multiplier: 2, duration: 3000 + Math.random() * 2000, label: "いつつばのくろーばー！少しの間なでるたびにうさぎが倍になる！" }
     : Math.random() < 0.5
-      ? { type: "ups", multiplier: 2, duration: 60000, label: "毎秒増加が60秒間2倍！" }
-      : { type: "upc", multiplier: 5, duration: 30000, label: "なでる増加が30秒間5倍！" };
+      ? { type: "ups", multiplier: 2, duration: 60000, label: "60秒のあいだうさぎがたくさんやってくる！" }
+      : { type: "upc", multiplier: 5, duration: 30000, label: "30秒間なでるごとにもっとうさぎがやってくる！" };
   state.activeBoost = {
     type: boost.type,
     multiplier: boost.multiplier,
