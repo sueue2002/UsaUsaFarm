@@ -8,7 +8,6 @@ const CLOVER_VISIBLE_MS = 10000;
 const CLOVER_SPAWN_CHANCE = 0.006;
 const FIVE_LEAF_SPAWN_CHANCE = 0.0004;
 const CLOVER_COOLDOWN_MS = 60000;
-const FRIEND_RABBIT_CHANCE = 0.08;
 
 const carrotRanks = [
   { min: 95, name: "ダイヤのにんじん", className: "carrot-diamond" },
@@ -31,17 +30,20 @@ const handRanks = [
 ];
 
 const friendRanks = [
-  { min: 40, name: "ほしぞらうさぎがやってくるようになった" },
-  { min: 25, name: "くりーむうさぎがやってくるようになった" },
-  { min: 12, name: "ももいろうさぎがやってくるようになった" },
-  { min: 1, name: "ちゃいろうさぎがやってくるようになった" },
+  { min: 75, name: "きんいろうさぎがやってきた！" },
+  { min: 50, name: "そらいろうさぎがやってきた！" },
+  { min: 30, name: "ももいろうさぎがやってきた！" },
+  { min: 15, name: "ちゃいろうさぎがやってきた！" },
+  { min: 5, name: "はいいろうさぎがやってきた！" },
   { min: 0, name: "おともだちはまだいない" }
 ];
 
 const friendRabbitClasses = [
-  { min: 25, className: "visual-rabbit-cream" },
-  { min: 12, className: "visual-rabbit-pink" },
-  { min: 1, className: "visual-rabbit-brown" }
+  { min: 5, chance: 0.05, className: "visual-rabbit-gray" },
+  { min: 15, chance: 0.03, className: "visual-rabbit-brown" },
+  { min: 30, chance: 0.02, className: "visual-rabbit-pink" },
+  { min: 50, chance: 0.01, className: "visual-rabbit-sky" },
+  { min: 75, chance: 0.001, className: "visual-rabbit-gold" }
 ];
 
 const soundPresets = [
@@ -556,8 +558,14 @@ function addVisualRabbit() {
 }
 
 function pickFriendRabbitClass() {
-  if (state.upgrades.friendLevel <= 0 || Math.random() > FRIEND_RABBIT_CHANCE) return "";
-  return friendRabbitClasses.find((item) => state.upgrades.friendLevel >= item.min)?.className ?? "";
+  const roll = Math.random();
+  let threshold = 0;
+  for (const item of friendRabbitClasses) {
+    if (state.upgrades.friendLevel < item.min) continue;
+    threshold += item.chance;
+    if (roll < threshold) return item.className;
+  }
+  return "";
 }
 
 function spawnFloat(amount, event) {

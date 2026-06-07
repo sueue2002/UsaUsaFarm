@@ -292,6 +292,10 @@ h1 {
   background: url("usagi.svg") center / contain no-repeat;
 }
 
+.visual-rabbit-gray::before {
+  filter: grayscale(1) brightness(0.92) contrast(0.95);
+}
+
 .visual-rabbit-brown::before {
   filter: sepia(0.9) saturate(1.25) brightness(0.86);
 }
@@ -300,8 +304,12 @@ h1 {
   filter: sepia(0.25) saturate(1.6) hue-rotate(290deg) brightness(1.08);
 }
 
-.visual-rabbit-cream::before {
-  filter: sepia(0.45) saturate(0.8) brightness(1.08);
+.visual-rabbit-sky::before {
+  filter: sepia(0.25) saturate(1.45) hue-rotate(165deg) brightness(1.08);
+}
+
+.visual-rabbit-gold::before {
+  filter: sepia(0.85) saturate(1.8) hue-rotate(350deg) brightness(1.12);
 }
 
 .visual-rabbit::after {
@@ -539,8 +547,11 @@ h1 {
 }
 
 .upgrade-button:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
+}
+
+.upgrade-button:disabled b {
+  opacity: 0.55;
 }
 
 .upgrade-button small {
