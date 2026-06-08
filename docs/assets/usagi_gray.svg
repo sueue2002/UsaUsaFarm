@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created using Krita: https://krita.org -->
+<svg xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:krita="http://krita.org/namespaces/svg/krita"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    width="114.72pt"
+    height="103.44pt"
+    viewBox="0 0 114.72 103.44">
+<defs>
+  <linearGradient id="gradient0" gradientUnits="objectBoundingBox" x1="0.0752283319187496" y1="-0.335929568267612" x2="0.58153386739403" y2="1.01481044663523" spreadMethod="pad">
+   <stop stop-color="#ffffff" offset="0" stop-opacity="1"/>
+   <stop stop-color="#a9b2b5" offset="1" stop-opacity="1"/>
+  </linearGradient>
+ </defs>
+<path id="shape0" transform="translate(2.95822531859773, 3.27860741100445)" fill="url(#gradient0)" fill-rule="evenodd" stroke="#999999" stroke-width="0.5196" stroke-linecap="square" stroke-linejoin="bevel" krita:marker-fill-method="auto" d="M56.9218 33.6814L56.9218 35.6014C48.5693 32.8341 41.3693 31.4741 35.3218 31.5214C27.043 32.2912 20.163 35.0512 14.6818 39.8014C0.932394 51.7169 3.76177 73.5214 6.40177 75.2014C4.10127 74.8975 -1.54637 76.4444 0.401775 85.4014C2.34992 94.3583 10.8372 94.2342 12.5218 91.5214C13.2418 93.3214 18.7376 96.3328 26.3218 97.4014C33.9059 98.47 75.426 95.678 82.2418 93.0814C89.0575 90.4848 92.7418 80.7214 93.7618 74.2414C94.2477 71.1542 94.0018 67.8214 91.2418 61.0414C93.7992 61.192 102.238 60.3838 105.042 54.2014C108.778 50.9313 111.23 47.0304 106.122 44.7214C103.521 42.0719 104.093 36.7249 99.8818 30.6814C90.7735 12.9341 68.6844 16.8529 67.0018 19.5214C60.938 11.1394 48.8221 -1.11491 41.0818 0.0813926C38.625 1.02724 38.2384 4.5491 38.5057 6.3632C36.2296 5.81217 34.276 5.60874 32.6818 5.84139C24.4209 7.3161 32.5949 27.5076 56.9218 33.6814Z" sodipodi:nodetypes="ccczczczzsccccccccc"/>
+</svg>
