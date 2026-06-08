@@ -26,10 +26,27 @@
 ```text
 docs/
   index.html
-  styles.css
-  app.js
+  app/
+    app.js
+  styles/
+    styles.css
   assets/
-    usagi.svg
+    rabbits/
+      usagi.svg
+      usagi_gray.svg
+      usagi_brown.svg
+      usagi_pink.svg
+      usagi_sky.svg
+      usagi_gold.svg
+    carrots/
+      carrot.svg
+      carrot_ruby.svg
+      carrot_garnet.svg
+      carrot_topaz.svg
+      carrot_emerald.svg
+      carrot_sapphire.svg
+      carrot_diamond.svg
+      carrot_leaf.svg
 ```
 
 動作確認は `docs/index.html` を直接ブラウザで開いて行います。
