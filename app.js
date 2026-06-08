@@ -46,6 +46,15 @@ const friendRabbitClasses = [
   { min: 75, chance: 0.001, className: "visual-rabbit-gold" }
 ];
 
+const friendSymbolSlots = [
+  { min: 0, className: "" },
+  { min: 5, className: "visual-rabbit-gray" },
+  { min: 15, className: "visual-rabbit-brown" },
+  { min: 30, className: "visual-rabbit-pink" },
+  { min: 50, className: "visual-rabbit-sky" },
+  { min: 75, className: "visual-rabbit-gold" }
+];
+
 const soundPresets = [
   { id: "A", label: "ぴょんっ！", start: 520, mid: 610, end: 760, duration: 0.18, volume: 0.18 },
   { id: "B", label: "ぴょいっ！", start: 470, mid: 650, end: 920, duration: 0.16, volume: 0.15 },
@@ -140,6 +149,7 @@ const els = {
   friendUpgradeTitle: document.getElementById("friendUpgradeTitle"),
   friendUpgrade: document.getElementById("friendUpgrade"),
   friendUpgradeText: document.getElementById("friendUpgradeText"),
+  friendSymbols: document.getElementById("friendSymbols"),
   friendCost: document.getElementById("friendCost"),
   farm: document.getElementById("farm"),
   farmStats: document.getElementById("farmStats"),
@@ -451,6 +461,7 @@ function render() {
     ? currentFriendRank().name
     : "150羽で解放";
   els.friendCost.textContent = state.unlocks.friend ? formatRabbits(friendCost) : "LOCK";
+  renderFriendSymbols();
   renderBoostIndicator(Boolean(boostType));
 
   els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
@@ -495,6 +506,16 @@ function renderBoostIndicator(hasBoost) {
   els.boostIndicator.textContent = state.activeBoost.type === "double" ? "✣" : "♣";
   els.boostIndicator.style.setProperty("--boost-progress", `${progress * 360}deg`);
   els.boostIndicator.classList.add("boost-indicator-visible");
+}
+
+function renderFriendSymbols() {
+  els.friendSymbols.innerHTML = "";
+  friendSymbolSlots.forEach((slot) => {
+    const symbol = document.createElement("span");
+    const unlocked = state.upgrades.friendLevel >= slot.min;
+    symbol.className = `friend-symbol${slot.className ? ` ${slot.className}` : ""}${unlocked ? "" : " friend-symbol-locked"}`;
+    els.friendSymbols.appendChild(symbol);
+  });
 }
 
 function activeBoostType() {

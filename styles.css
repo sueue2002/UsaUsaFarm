@@ -297,19 +297,22 @@ h1 {
 }
 
 .visual-rabbit-brown::before {
-  filter: sepia(0.9) saturate(1.25) brightness(0.86);
+  filter: sepia(1) saturate(1.25) brightness(0.80);
 }
 
 .visual-rabbit-pink::before {
-  filter: sepia(0.25) saturate(1.6) hue-rotate(290deg) brightness(1.08);
+  filter: drop-shadow(0 0 0 #ff007f) saturate(2);
+      /*sepia(0.25) saturate(1.6) hue-rotate(290deg) brightness(1.08);*/
 }
 
 .visual-rabbit-sky::before {
-  filter: sepia(0.25) saturate(1.45) hue-rotate(165deg) brightness(1.08);
+    filter: drop-shadow(0 0 0 #00bfff) saturate(2);
+    /*sepia(0.25) saturate(1.45) hue-rotate(165deg) brightness(1.08);*/
 }
 
 .visual-rabbit-gold::before {
-  filter: sepia(0.85) saturate(1.8) hue-rotate(350deg) brightness(1.12);
+    filter: drop-shadow(0 0 0 #e6b422) saturate(2);
+    /*sepia(0.85) saturate(1.8) hue-rotate(350deg) brightness(1.12);*/
 }
 
 .visual-rabbit::after {
@@ -465,7 +468,11 @@ h1 {
 
 .upgrade-card-heading {
   display: grid;
-  gap: 3px;
+  grid-template-columns: 48px 1fr 78px;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  text-align: center;
 }
 
 .upgrade-card-heading small {
@@ -534,9 +541,9 @@ h1 {
 
 .upgrade-button {
   min-height: 66px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px 1fr 78px;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 12px;
   border: 0;
@@ -558,6 +565,58 @@ h1 {
   display: block;
   margin-top: 3px;
   color: var(--soft);
+}
+
+.upgrade-label {
+  min-width: 0;
+  text-align: center;
+}
+
+.upgrade-label strong,
+.upgrade-label small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upgrade-symbol,
+.carrot-card-gem,
+.friend-symbols {
+  width: 48px;
+  min-width: 48px;
+}
+
+.upgrade-symbol-empty {
+  height: 36px;
+}
+
+.friend-symbols {
+  display: grid;
+  grid-template-columns: repeat(3, 13px);
+  grid-template-rows: repeat(2, 13px);
+  justify-content: center;
+  align-content: center;
+  gap: 3px;
+  height: 34px;
+}
+
+.friend-symbol {
+  position: relative;
+  display: block;
+  width: 13px;
+  height: 13px;
+  opacity: 1;
+}
+
+.friend-symbol::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("usagi.svg") center / contain no-repeat;
+}
+
+.friend-symbol-locked {
+  opacity: 0;
 }
 
 .upgrade-button b {

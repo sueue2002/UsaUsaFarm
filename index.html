@@ -38,7 +38,7 @@
       <section class="upgrade-panel" aria-label="強化">
         <button id="carrotUpgrade" class="upgrade-button" type="button">
           <span id="carrotGem" class="carrot carrot-normal carrot-card-gem" aria-hidden="true"></span>
-          <span>
+          <span class="upgrade-label">
             <strong id="carrotUpgradeTitle">にんじんLv.0</strong>
             <small id="carrotUpgradeText">毎秒増加量を上げる</small>
           </span>
@@ -46,7 +46,8 @@
         </button>
 
         <button id="handUpgrade" class="upgrade-button" type="button">
-          <span>
+          <span class="upgrade-symbol upgrade-symbol-empty" aria-hidden="true"></span>
+          <span class="upgrade-label">
             <strong id="handUpgradeTitle">なでる手Lv.0</strong>
             <small id="handUpgradeText">なでる増加量を上げる</small>
           </span>
@@ -55,14 +56,18 @@
 
         <section class="farm-upgrade-card" aria-label="ふぁーむ強化">
           <div class="upgrade-card-heading">
-            <strong id="farmUpgradeTitle">ふぁーむLv.0</strong>
-            <small id="farmUpgradeText">背景を選択できます</small>
+            <span class="upgrade-symbol upgrade-symbol-empty" aria-hidden="true"></span>
+            <span class="upgrade-label">
+              <strong id="farmUpgradeTitle">ふぁーむLv.0</strong>
+              <small id="farmUpgradeText">背景を選択できます</small>
+            </span>
           </div>
           <div id="farmTierButtons" class="farm-tier-buttons"></div>
         </section>
 
         <button id="friendUpgrade" class="upgrade-button" type="button">
-          <span>
+          <span id="friendSymbols" class="friend-symbols" aria-hidden="true"></span>
+          <span class="upgrade-label">
             <strong id="friendUpgradeTitle">おともだちLv.0</strong>
             <small id="friendUpgradeText">なでる力で手伝ってもらう</small>
           </span>
