@@ -67,20 +67,25 @@ button {
 
 h1 {
   margin: 0;
-  font-size: clamp(1.8rem, 10vw, 2.4rem);
+  font-size: clamp(1.25rem, 6vw, 1.75rem);
   line-height: 1;
 }
 
 .farm-name-button {
-  max-width: min(70vw, 330px);
+  max-width: min(62vw, 300px);
   padding: 0;
   border: 0;
   background: transparent;
   color: inherit;
-  font: inherit;
+  font-family: inherit;
+  font-size: var(--farm-name-size, inherit);
+  line-height: 1;
   font-weight: 900;
   text-align: left;
-  overflow-wrap: anywhere;
+  display: block;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -658,5 +663,39 @@ h1 {
 @media (min-height: 720px) {
   .farm {
     min-height: 350px;
+  }
+}
+
+@media (max-width: 520px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .game-shell {
+    height: 100dvh;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 7px;
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .game-header {
+    gap: 8px;
+  }
+
+  .farm {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .upgrade-panel {
+    gap: 6px;
+  }
+
+  .reset-zone {
+    display: none;
   }
 }

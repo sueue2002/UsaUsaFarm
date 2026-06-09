@@ -30,10 +30,14 @@ docs/
     app.js
     audio.js
     config.js
+    clover.js
     dom.js
+    effects.js
     logic.js
+    messages.js
     render.js
     state.js
+    upgrades.js
     utils.js
   styles/
     styles.css

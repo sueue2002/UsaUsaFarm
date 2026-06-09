@@ -31,6 +31,7 @@ export function render() {
   const boostType = activeBoostType();
 
   els.farmNameButton.textContent = state.settings.farmName;
+  els.farmNameButton.style.setProperty("--farm-name-size", `${farmNameSize(state.settings.farmName)}rem`);
   document.title = state.settings.farmName;
   els.rabbitCount.textContent = formatRabbitCount(state.rabbits);
   els.perSecond.textContent = `毎秒 +${formatRate(currentUps())}`;
@@ -70,6 +71,11 @@ export function render() {
   els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
   els.soundToggle.setAttribute("aria-label", state.settings.soundEnabled ? "音をオフにする" : "音をオンにする");
   els.soundVariant.textContent = soundPresets[selectedSoundIndex()].label;
+}
+
+function farmNameSize(name) {
+  const length = Math.max(1, Array.from(name).length);
+  return clamp(12 / length, 0.52, 1.55);
 }
 
 function renderFarmButtons() {
