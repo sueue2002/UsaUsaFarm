@@ -65,3 +65,7 @@ python -m http.server 8000 --directory docs
 起動後、`http://127.0.0.1:8000/` を開きます。
 
 進行状況は `localStorage` に保存されます。
+
+## ライセンス
+
+このプロジェクトは MIT License で公開します。コード、ドキュメント、および `docs/assets/` 配下のSVG素材は、別途明記がない限り同じライセンスに含みます。
