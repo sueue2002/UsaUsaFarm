@@ -294,30 +294,27 @@ h1 {
 .visual-rabbit::before {
   inset: 0;
   z-index: 1;
-  background: url("../assets/rabbits/usagi.svg") center / contain no-repeat;
+  background: var(--rabbit-image, url("../assets/rabbits/usagi.svg")) center / contain no-repeat;
 }
 
-.visual-rabbit-gray::before {
-  filter: grayscale(1) brightness(0.92) contrast(0.95);
+.visual-rabbit-gray {
+  --rabbit-image: url("../assets/rabbits/usagi_gray.svg");
 }
 
-.visual-rabbit-brown::before {
-  filter: sepia(1) saturate(1.25) brightness(0.80);
+.visual-rabbit-brown {
+  --rabbit-image: url("../assets/rabbits/usagi_brown.svg");
 }
 
-.visual-rabbit-pink::before {
-  filter: drop-shadow(0 0 0 #ff007f) saturate(2);
-      /*sepia(0.25) saturate(1.6) hue-rotate(290deg) brightness(1.08);*/
+.visual-rabbit-pink {
+  --rabbit-image: url("../assets/rabbits/usagi_pink.svg");
 }
 
-.visual-rabbit-sky::before {
-    filter: drop-shadow(0 0 0 #00bfff) saturate(2);
-    /*sepia(0.25) saturate(1.45) hue-rotate(165deg) brightness(1.08);*/
+.visual-rabbit-sky {
+  --rabbit-image: url("../assets/rabbits/usagi_sky.svg");
 }
 
-.visual-rabbit-gold::before {
-    filter: drop-shadow(0 0 0 #e6b422) saturate(2);
-    /*sepia(0.85) saturate(1.8) hue-rotate(350deg) brightness(1.12);*/
+.visual-rabbit-gold {
+  --rabbit-image: url("../assets/rabbits/usagi_gold.svg");
 }
 
 .visual-rabbit::after {
@@ -338,11 +335,10 @@ h1 {
   z-index: 2;
   right: 22px;
   bottom: 22px;
-  width: 48px;
-  height: 82px;
-  border-radius: 52% 52% 46% 46%;
-  transform: rotate(28deg);
-  box-shadow: inset -10px -12px rgba(83, 74, 94, 0.12);
+  width: 58px;
+  height: 52px;
+  transform: rotate(12deg);
+  background: none;
   opacity: 0.88;
   pointer-events: none;
 }
@@ -352,37 +348,38 @@ h1 {
   right: auto;
   bottom: auto;
   flex: 0 0 auto;
-  width: 28px;
-  height: 48px;
-  transform: rotate(20deg);
+  width: 52px;
+  height: 46px;
+  transform: rotate(8deg);
 }
 
-.carrot-card-gem::before {
-  top: -14px;
-  left: 7px;
-  width: 18px;
-  height: 20px;
+.carrot::before,
+.carrot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .carrot::before {
-  content: "";
-  position: absolute;
-  top: -22px;
-  left: 12px;
-  width: 28px;
-  height: 30px;
-  border-radius: 50% 50% 0 50%;
-  background: #87d99a;
-  transform: rotate(-28deg);
+  z-index: 0;
+  background-image: url("../assets/carrots/carrot_leaf.svg");
 }
 
-.carrot-normal { background: #ffb05c; }
-.carrot-ruby { background: #ff5e87; }
-.carrot-garnet { background: #b33a58; }
-.carrot-topaz { background: #ffd25f; }
-.carrot-emerald { background: #53d49a; }
-.carrot-sapphire { background: #5aa7ff; }
-.carrot-diamond { background: #dff8ff; }
+.carrot::after {
+  z-index: 1;
+  background-image: var(--carrot-body);
+}
+
+.carrot-normal { --carrot-body: url("../assets/carrots/carrot.svg"); }
+.carrot-ruby { --carrot-body: url("../assets/carrots/carrot_ruby.svg"); }
+.carrot-garnet { --carrot-body: url("../assets/carrots/carrot_garnet.svg"); }
+.carrot-topaz { --carrot-body: url("../assets/carrots/carrot_topaz.svg"); }
+.carrot-emerald { --carrot-body: url("../assets/carrots/carrot_emerald.svg"); }
+.carrot-sapphire { --carrot-body: url("../assets/carrots/carrot_sapphire.svg"); }
+.carrot-diamond { --carrot-body: url("../assets/carrots/carrot_diamond.svg"); }
 
 .carrot-locked {
   filter: saturate(0.55);
@@ -617,7 +614,7 @@ h1 {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("../assets/rabbits/usagi.svg") center / contain no-repeat;
+  background: var(--rabbit-image, url("../assets/rabbits/usagi.svg")) center / contain no-repeat;
 }
 
 .friend-symbol-locked {

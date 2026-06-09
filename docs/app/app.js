@@ -9,6 +9,7 @@ import { addRabbits, createDefaultState, saveState, setState, state } from "./st
 import { upgradeCarrot, upgradeFriend, upgradeHand, handleFarmTierClick } from "./upgrades.js";
 import { playPyon } from "./audio.js";
 
+// TODO: これ以降のモジュール分割は、新機能追加で責務が増えたタイミングで行う。
 let lastTick = performance.now();
 let lastAutoSave = performance.now();
 let lastUiUpdate = performance.now();
