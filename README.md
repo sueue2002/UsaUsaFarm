@@ -28,6 +28,13 @@ docs/
   index.html
   app/
     app.js
+    audio.js
+    config.js
+    dom.js
+    logic.js
+    render.js
+    state.js
+    utils.js
   styles/
     styles.css
   assets/
@@ -49,6 +56,12 @@ docs/
       carrot_leaf.svg
 ```
 
-動作確認は `docs/index.html` を直接ブラウザで開いて行います。
+動作確認は GitHub Pages またはローカルHTTPサーバーで行います。
+
+```powershell
+python -m http.server 8000 --directory docs
+```
+
+起動後、`http://127.0.0.1:8000/` を開きます。
 
 進行状況は `localStorage` に保存されます。
