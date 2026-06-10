@@ -135,6 +135,11 @@ h1 {
   gap: 0.4em;
 }
 
+.sound-variant-button {
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
 .label {
   display: block;
   margin-bottom: 4px;
