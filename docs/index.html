@@ -16,7 +16,10 @@
           </h1>
         </div>
         <div class="header-actions">
-          <button id="soundToggle" class="icon-button" type="button" aria-label="音を切り替える">♪</button>
+          <button id="soundToggle" class="icon-button sound-toggle-button" type="button" aria-label="音を切り替える">
+            <span aria-hidden="true">♪</span>
+            <span id="soundState" aria-hidden="true">○</span>
+          </button>
           <button id="soundVariant" class="icon-button sound-variant-button" type="button">ぴょこっ！</button>
         </div>
       </header>

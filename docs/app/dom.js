@@ -27,6 +27,7 @@ export const els = {
   visualRabbitLayer: document.getElementById("visualRabbitLayer"),
   floatLayer: document.getElementById("floatLayer"),
   soundToggle: document.getElementById("soundToggle"),
+  soundState: document.getElementById("soundState"),
   soundVariant: document.getElementById("soundVariant"),
   resetGame: document.getElementById("resetGame")
 };

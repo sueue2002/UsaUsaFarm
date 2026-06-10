@@ -68,7 +68,7 @@ export function render() {
   renderFriendSymbols();
   renderBoostIndicator(Boolean(boostType));
 
-  els.soundToggle.textContent = state.settings.soundEnabled ? "♪" : "×";
+  els.soundState.textContent = state.settings.soundEnabled ? "○" : "×";
   els.soundToggle.setAttribute("aria-label", state.settings.soundEnabled ? "音をオフにする" : "音をオンにする");
   els.soundVariant.textContent = soundPresets[selectedSoundIndex()].label;
 }
